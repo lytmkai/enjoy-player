@@ -3,34 +3,41 @@ name: Build Desktop App
 on:
   push:
     branches:
-      - main  # 当推送到 main 分支时触发，可根据实际情况修改
-  workflow_dispatch: # 允许手动触发
+      - main
+  workflow_dispatch:
 
 jobs:
   build:
     name: Build EXE on Windows
-    runs-on: windows-latest # 使用 Windows 环境，因为要生成 exe
+    runs-on: windows-latest
 
     steps:
+      # 1. 升级到 v5 解决 Node.js 20 弃用警告
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5 
 
+      # 2. 配置 Node.js 并启用 pnpm 缓存
       - name: Install Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
-          node-version: '18' # 项目描述中提到 Node.js 18+
-          cache: 'npm'
+          node-version: '20'
+          cache: 'pnpm'  # 【核心修复】将 npm 改为 pnpm，自动识别 pnpm-lock.yaml
+      
+      # 3. 全局安装 pnpm
+      - name: Install pnpm
+        run: npm install -g pnpm
 
+      # 4. 使用 pnpm 安装依赖
       - name: Install dependencies
-        run: npm install
+        run: pnpm install
 
+      # 5. 构建 Electron 应用
       - name: Build Electron App
-        run: npm run make
-        # 注意：这依赖于 package.json 中的 scripts 配置。
-        # 如果报错，可能需要尝试 npx electron-forge make
+        run: pnpm run make
 
+      # 6. 上传生成的 EXE 安装包
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-installer
-          path: out/make/squirrelwin/Release/*.exe # 此路径取决于 electron-forge 的默认输出结构
+          path: out/make/squirrelwin/Release/*.exe
