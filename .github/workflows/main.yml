@@ -12,32 +12,36 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1. 升级到 v5 解决 Node.js 20 弃用警告
       - name: Checkout code
         uses: actions/checkout@v5 
+
+      # 1. 使用官方插件安装 pnpm（彻底解决 PATH 找不到的问题）
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest  # 也可以指定具体版本，如 version: 8.15.0
 
       # 2. 配置 Node.js 并启用 pnpm 缓存
       - name: Install Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '20'
-          cache: 'pnpm'  # 【核心修复】将 npm 改为 pnpm，自动识别 pnpm-lock.yaml
+          cache: 'pnpm'  
       
-      # 3. 全局安装 pnpm
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      # 4. 使用 pnpm 安装依赖
+      # 3. 安装依赖
       - name: Install dependencies
         run: pnpm install
 
-      # 5. 构建 Electron 应用
+      # 4. 构建 Electron 应用
       - name: Build Electron App
         run: pnpm run make
 
-      # 6. 上传生成的 EXE 安装包
+      # 5. 上传生成的 EXE 安装包
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-installer
           path: out/make/squirrelwin/Release/*.exe
+
+
+          
