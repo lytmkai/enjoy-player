@@ -10,7 +10,7 @@
     "dev:electron": "nodemon --exec electron . --watch ./ --ext .js,.html,.scss,.vue,.ts,.css",
     "build:web": "vite build",
     "build:mac": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --x64",
-    "build:win": "electron-builder --win --x64",
+    "build:win": "electron-builder --win --x64 --publish never",
     "build:linux": " electron-builder --linux",
     "preview": "vite preview",
     "build-only": "vite build",
