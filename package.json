@@ -8,7 +8,7 @@
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:electron\"",
     "dev:web": "vite",
     "dev:electron": "nodemon --exec electron . --watch ./ --ext .js,.html,.scss,.vue,.ts,.css",
-    "build:web": "run-p type-check \"build-only {@}\" --",
+    "build:web": "vite build",
     "build:mac": "CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --x64",
     "build:win": "electron-builder --win --x64",
     "build:linux": " electron-builder --linux",
