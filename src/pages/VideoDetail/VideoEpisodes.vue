@@ -18,14 +18,12 @@
       </div>
     </div>
 
-    <!-- 剧集列表网格 -->
     <div
       class="episodes-box grid flex-1 gap-2 overflow-y-auto overflow-x-hidden p-2 pt-0"
       :style="{
         'grid-template-columns': `repeat(auto-fit, minmax(${textWidth}px, 1fr))`,
       }"
     >
-      <!-- 单个剧集项 -->
       <div
         v-for="(item, idx) in data.vod_play_url"
         :class="{ active: videoDetailStore.curEpisodeIdx === idx }"
@@ -33,14 +31,10 @@
         :key="item.url"
         :title="item.name"
         @click="videoDetailStore.changeEpisode(idx)"
-        
-        <!-- 【核心修改】监听右键点击事件 -->
         @contextmenu.prevent="handleRightClick($event, item.url)"
       >
-        <!-- 剧集名称 -->
         <div class="truncate">{{ item.name }}</div>
 
-        <!-- 【新增】复制成功提示气泡 -->
         <div 
           v-if="copiedUrl === item.url" 
           class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white shadow-lg"
@@ -49,7 +43,6 @@
           链接已复制
         </div>
 
-        <!-- 播放指示动画 (原有的) -->
         <div class="absolute" :class="{ playon: videoDetailStore.curEpisodeIdx === idx }">
           <i></i><i></i><i></i><i></i>
         </div>
