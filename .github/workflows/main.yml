@@ -15,33 +15,33 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5 
 
-      # 1. 使用官方插件安装 pnpm（彻底解决 PATH 找不到的问题）
+      # 安装 pnpm (使用 v8 以兼容 Node.js 20)
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 8  # 也可以指定具体版本，如 version: 8.15.0
+          version: 8
 
-      # 2. 配置 Node.js 并启用 pnpm 缓存
+      # 配置 Node.js 环境
       - name: Install Node.js
         uses: actions/setup-node@v5
         with:
           node-version: '20'
           cache: 'pnpm'  
-      
-      # 3. 安装依赖
+
+      # 安装依赖
       - name: Install dependencies
         run: pnpm install
 
-      # 4. 构建 Electron 应用
-      - name: Build Electron App
-        run: pnpm run make
+      # 构建项目
+      - name: Build Web Assets
+        run: pnpm run build:web
+      
+      - name: Build Electron App (Windows)
+        run: pnpm run build:win
 
-      # 5. 上传生成的 EXE 安装包
+      # 上传产物
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-installer
-          path: out/make/squirrelwin/Release/*.exe
-
-
-          
+          path: dist-electron/*.exe
