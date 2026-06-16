@@ -18,12 +18,14 @@
       </div>
     </div>
 
+    <!-- 剧集列表网格 -->
     <div
       class="episodes-box grid flex-1 gap-2 overflow-y-auto overflow-x-hidden p-2 pt-0"
       :style="{
         'grid-template-columns': `repeat(auto-fit, minmax(${textWidth}px, 1fr))`,
       }"
     >
+      <!-- 单个剧集项 -->
       <div
         v-for="(item, idx) in data.vod_play_url"
         :class="{ active: videoDetailStore.curEpisodeIdx === idx }"
@@ -33,16 +35,20 @@
         @click="videoDetailStore.changeEpisode(idx)"
         @contextmenu.prevent="handleRightClick($event, item.url)"
       >
+        <!-- 剧集名称 -->
         <div class="truncate">{{ item.name }}</div>
 
-        <div 
-          v-if="copiedUrl === item.url" 
-          class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white shadow-lg"
-          :style="{ animation: 'fade-slide 2s ease-out forwards' }"
-        >
-          链接已复制
-        </div>
+        <!-- 【修复】复制成功提示气泡 - 使用简单的过渡效果 -->
+        <transition name="fade-up">
+          <div 
+            v-if="copiedUrl === item.url" 
+            class="absolute -top-10 left-1/2 z-50 -translate-x-1/2 whitespace-nowrap rounded bg-black/80 px-3 py-1.5 text-xs text-white shadow-lg pointer-events-none"
+          >
+            链接已复制
+          </div>
+        </transition>
 
+        <!-- 播放指示动画 (原有的) -->
         <div class="absolute" :class="{ playon: videoDetailStore.curEpisodeIdx === idx }">
           <i></i><i></i><i></i><i></i>
         </div>
@@ -71,15 +77,16 @@ const textWidth = computed(() => Math.max(textWidthRef.value?.offsetWidth || 0, 
 
 // 【核心逻辑】处理右键点击
 const handleRightClick = async (e: MouseEvent, url: string) => {
-  e.preventDefault() // 防止默认的右键菜单弹出
+  // 阻止默认的右键菜单弹出
+  e.preventDefault() 
   
   try {
     await navigator.clipboard.writeText(url)
     
-    // 设置当前复制的 URL，用于触发提示显示
+    // 设置当前复制的 URL，触发气泡显示
     copiedUrl.value = url
     
-    // 2秒后清除提示（与 CSS 动画时间一致）
+    // 2秒后清除提示
     setTimeout(() => {
       if (copiedUrl.value === url) {
         copiedUrl.value = ''
@@ -126,23 +133,21 @@ const handleRightClick = async (e: MouseEvent, url: string) => {
 .playon i:nth-last-child(3) { animation: playon 0.6s 0.2s infinite; left: 12px; }
 .playon i:nth-last-child(4) { animation: playon 1s 0.3s infinite; left: 18px; }
 
-/* 【新增】提示气泡的动画 */
-@keyframes fade-slide {
-  0% {
-    opacity: 0;
-    transform: translateY(10px) translateX(-50%);
-  }
-  10% {
-    opacity: 1;
-    transform: translateY(-10px) translateX(-50%);
-  }
-  90% {
-    opacity: 1;
-    transform: translateY(-10px) translateX(-50%);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-20px) translateX(-50%);
-  }
+/* 【修复】简单的淡入淡出向上动画 */
+.fade-up-enter-active,
+.fade-up-leave-active {
+  transition: all 0.3s ease;
+}
+
+.fade-up-enter-from,
+.fade-up-leave-to {
+  opacity: 0;
+  transform: translateY(10px) translateX(-50%);
+}
+
+.fade-up-enter-to,
+.fade-up-leave-from {
+  opacity: 1;
+  transform: translateY(-10px) translateX(-50%);
 }
 </style>
