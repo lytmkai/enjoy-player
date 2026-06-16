@@ -1,0 +1,36 @@
+name: Build Desktop App
+
+on:
+  push:
+    branches:
+      - main  # 当推送到 main 分支时触发，可根据实际情况修改
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  build:
+    name: Build EXE on Windows
+    runs-on: windows-latest # 使用 Windows 环境，因为要生成 exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18' # 项目描述中提到 Node.js 18+
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Electron App
+        run: npm run make
+        # 注意：这依赖于 package.json 中的 scripts 配置。
+        # 如果报错，可能需要尝试 npx electron-forge make
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: out/make/squirrelwin/Release/*.exe # 此路径取决于 electron-forge 的默认输出结构
